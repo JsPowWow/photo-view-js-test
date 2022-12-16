@@ -1,10 +1,15 @@
 import {isDefined} from "../supportClasses/utils";
 import {getLogger} from "../supportClasses/Logger";
-import {getViewPreferences, buildViewPreferences} from "./utils";
+import {buildViewPreferences, getViewPreferences} from "./utils";
 
 const thisLogger = getLogger('EditorLogging');
 
 class PhotoViewer {
+
+    constructor() {
+        this.fixScrollPosition = this.fixScrollPosition.bind(this)
+    }
+
     /**
      * @type {CanvasView}
      */
@@ -71,17 +76,35 @@ class PhotoViewer {
         return this;
     }
 
+    fixScrollPosition(viewDrawInfos) {
+        const result = {...viewDrawInfos}
+
+        const {x: newX, width: newWidth} = result;
+        if (newX > 0) {
+            Object.assign(result, {x: 0})
+        } else if ((newX + newWidth < this.surface.canvas.width)) {
+            Object.assign(result, {x: this.surface.canvas.width - newWidth})
+        }
+
+        const {y: newY, height: newHeight} = result;
+        if (newY > 0) {
+            Object.assign(result, {y: 0})
+        } else if ((newY + newHeight < this.surface.canvas.height)) {
+            Object.assign(result, {y: this.surface.canvas.height - newHeight})
+        }
+        return result
+    }
+
     /**
      *
-     * @param [options] {Object}
-     * @param [options.offsetX=0] {Number}
-     * @param [options.offsetY=0] {Number}
+     * @param [options=] {Object}
+     * @param [options.x=] {Number}
+     * @param [options.y=] {Number}
      */
-    redraw(options = {offsetX: 0, offsetY: 0}) {
+    redraw(options) {
         if (isDefined(this.image)) {
-            const {offsetX = this.surface.offset.x, offsetY = this.surface.offset.y} = options ?? {offsetX: 0, offsetY: 0};
             this.surface
-                .drawFromImage(this.image, {offsetX, offsetY});
+                .drawFromImage(this.image, {x: options?.x, y: options?.y, onValidate: this.fixScrollPosition});
         }
     }
 
@@ -98,12 +121,12 @@ class PhotoViewer {
             const preferences = getViewPreferences(this);
             thisLogger.info("pref(i):", preferences)
             this.redraw({
-                offsetX: preferences.canvas.photo.x - this.surface.topLeft.x + this.surface.offset.x,
-                offsetY: preferences.canvas.photo.y - this.surface.topLeft.y + this.surface.offset.y })
+                x: preferences.canvas.photo.x,
+                y: preferences.canvas.photo.y
+            })
         } else {
             this.redraw();
         }
-
         return this;
     }
 
@@ -121,8 +144,9 @@ class PhotoViewer {
             const preferences = getViewPreferences(this);
             thisLogger.info("pref(d):", preferences)
             this.redraw({
-                offsetX: preferences.canvas.photo.x - this.surface.topLeft.x + this.surface.offset.x,
-                offsetY: preferences.canvas.photo.y - this.surface.topLeft.y + this.surface.offset.y })
+                x: preferences.canvas.photo.x,
+                y: preferences.canvas.photo.y
+            })
         } else {
             this.redraw();
         }
@@ -141,9 +165,9 @@ class PhotoViewer {
 
     scrollBy(xBy, yBy) {
         if (isDefined(this.image)) {
-            const offsetX = this.surface.offset.x + xBy;
-            const offsetY = this.surface.offset.y + yBy;
-            this.redraw({offsetX, offsetY});
+            const x = this.surface.topLeft.x + xBy;
+            const y = this.surface.topLeft.y + yBy;
+            this.redraw({x, y});
         }
     }
 }

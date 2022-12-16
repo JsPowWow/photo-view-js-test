@@ -16,6 +16,7 @@ const readDataAsync = (file) => {
         })
     });
 };
+
 async function processFile(inputId) {
     const file = document.getElementById(inputId).files[0];
     if (!file) {
@@ -43,7 +44,7 @@ class JsonFileLoader {
 
     async import() {
         const {data, file} = await processFile(this.#inputId)
-        return { data, id: file.name};
+        return {data, id: file.name};
     }
 }
 

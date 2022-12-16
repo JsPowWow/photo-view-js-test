@@ -50,3 +50,28 @@ export const getViewPreferences = (preview) => {
     }
     return undefined;
 }
+
+/**
+ * @param canvas {HTMLCanvasElement}
+ * @param image {HTMLImageElement}
+ * @param [xPos] {Number}
+ * @param [yPos] {Number}
+ * @return {{x: number, width: number, y: number, height: number}}
+ */
+export const computeTargetRect = ({canvas, image, x: xPos, y: yPos}) => {
+    const srcWidth = image.naturalWidth;
+    const srcHeight = image.naturalHeight;
+
+    const hRatio = canvas.width / srcWidth;
+    const vRatio = canvas.height / srcHeight;
+
+    const scaleFactor = Math.max(hRatio, vRatio);
+
+    const newWidth = srcWidth * scaleFactor;
+    const newHeight = srcHeight * scaleFactor;
+
+    const x = xPos ?? (canvas.width * 0.5) - (newWidth * 0.5);
+    const y = yPos ?? (canvas.height * 0.5) - (newHeight * 0.5);
+
+    return {x, y, width: newWidth, height: newHeight};
+}

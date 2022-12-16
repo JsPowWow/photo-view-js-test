@@ -10,6 +10,7 @@ class ClassFactory {
      * @type {Object}
      */
     #props = {};
+
     /**
      * @type {Array}
      */

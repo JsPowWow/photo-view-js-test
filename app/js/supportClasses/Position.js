@@ -1,5 +1,13 @@
 class Position {
+    /**
+     * @type {number}
+     */
     #xPos = 0;
+
+    /**
+     * @type {number}
+     */
+    #yPos = 0;
 
     /**
      * @returns {number}
@@ -15,9 +23,7 @@ class Position {
         return this.#yPos;
     }
 
-    #yPos = 0;
-
-    reset(options = {x : 0, y : 0}) {
+    reset(options = {x: 0, y: 0}) {
         this.#xPos = options.x ?? 0;
         this.#yPos = options.y ?? 0;
         return this;

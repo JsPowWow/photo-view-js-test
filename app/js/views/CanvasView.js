@@ -1,5 +1,6 @@
 import {getLogger} from "../supportClasses/Logger";
 import Position from "../supportClasses/Position";
+import {computeTargetRect} from "./utils";
 
 const thisLogger = getLogger('CanvasViewLogging');
 const VIEW_RECT_RATIO = 10 / 15;
@@ -30,18 +31,6 @@ class CanvasView {
     }
 
     /**
-     * @type {Position}
-     */
-    #offset = new Position();
-
-    /**
-     * @type {Position}
-     */
-    get offset() {
-        return this.#offset;
-    }
-
-    /**
      * @returns {HTMLCanvasElement} The {@link HTMLCanvasElement} DOM element reference associated with view
      */
     get canvas() {
@@ -58,90 +47,52 @@ class CanvasView {
         return this;
     }
 
-    /**
-     * @description Clear the view surface
-     * @returns {CanvasView}
-     */
-    clear() {
-        // TODO not required ?
-        this.#canvas
-            .getContext('2d')
-            .clearRect(0, 0, this.#canvas.width, this.#canvas.height);
-        return this;
-    }
-
-    invalidate({sourceImage, offsetX, offsetY}) {
+    invalidate(infos) {
         if (this.#rafId) {
             window.cancelAnimationFrame(this.#rafId);
             this.#rafId = undefined;
         }
         this.#rafId = window.requestAnimationFrame(() => {
-            this.validate({sourceImage, offsetX, offsetY})
+            this.validate(infos)
         })
     }
 
-    computeTargetRect(sourceImage, options = {offsetX: 0, offsetY: 0}) {
-        const canvas = this.#canvas;
-        const srcWidth = sourceImage.naturalWidth;
-        const srcHeight = sourceImage.naturalHeight;
-
-        const hRatio = canvas.width / srcWidth;
-        const vRatio = canvas.height / srcHeight;
-
-        const scaleFactor = Math.max(hRatio, vRatio);
-
-        const newWidth = srcWidth * scaleFactor;
-        const newHeight = srcHeight * scaleFactor;
-
-        const {offsetX = 0, offsetY = 0} = options ?? {};
-
-        const x = (canvas.width * 0.5) - (newWidth * 0.5) + offsetX;
-        const y = (canvas.height * 0.5) - (newHeight * 0.5) + offsetY;
-
-        return {x, y, width: newWidth, height: newHeight};
-    }
-
-    validate({sourceImage, offsetX, offsetY}) {
+    validate({sourceImage, x, y, onValidate}) {
         if (sourceImage) {
-            thisLogger.info("~~~~~~~ compute for ", {offsetX, offsetY});
+            thisLogger.info(`~~~~~~~ validate for ${x},${y}`);
+            thisLogger.info(`@canvas: ${this.canvas.width},${this.canvas.height}`);
+            thisLogger.info(`@image: ${sourceImage.naturalWidth},${sourceImage.naturalWidth}`);
 
-            const {x:newX, y:newY, width, height} = this.computeTargetRect(sourceImage, {offsetX, offsetY})
+            const {x: newX = 0, y: newY = 0, width = 0, height = 0} = onValidate
+                ? onValidate({...computeTargetRect({canvas: this.canvas, image:sourceImage, x, y})})
+                : computeTargetRect({canvas: this.canvas, image:sourceImage, x, y})
 
-            thisLogger.info("rect:", {newX, newY, width, height});
-            thisLogger.info(`canvas: ${this.canvas.width},${this.canvas.height}`);
-            thisLogger.info(`image: ${sourceImage.naturalWidth},${sourceImage.naturalWidth}`);
+            thisLogger.info("calc:", {newX, newY, width, height});
 
-            const ctx = this.#canvas.getContext('2d');
-            ctx.drawImage(sourceImage, newX, newY, width, height);
-
-            this.#topLeft.reset({x: newX, y: newY});
-            this.#offset.reset({x: offsetX, y: offsetY});
-
-            thisLogger.info("will draw:", {newX, newY, width, height});
-            thisLogger.info("topLeft:", `${this.topLeft.x},${this.topLeft.y}`);
-            thisLogger.info("offset:", `${this.offset.x},${this.offset.y}`);
-
+            const ctx = this.canvas.getContext('2d');
+            this.topLeft.reset({x: newX, y: newY});
+            ctx.drawImage(sourceImage, this.topLeft.x, this.topLeft.y, width, height);
+            thisLogger.info(`~~~~~~~ validated: topLeft:(${this.topLeft.x},${this.topLeft.y}), size:${width},${height}`);
         }
     }
 
     /**
      * @description Draw provided {@link HTMLImageElement} image onto canvas view
      * @param sourceImage {HTMLImageElement}
-     * @param options {Object}
-     * @param options.offsetX {Number}
-     * @param options.offsetY {Number}
+     * @param [options] {Object}
+     * @param [options.x] {Number}
+     * @param [options.y] {Number}
+     * @param [options.onValidate] {Function}
      * @returns {CanvasView}
      */
 
-    drawFromImage(sourceImage, options = {offsetX: 0, offsetY: 0}) {
+    drawFromImage(sourceImage, options = undefined) {
         if (sourceImage) {
             const srcWidth = sourceImage.naturalWidth;
-            this.#canvas.width = srcWidth;
-            this.#canvas.height = srcWidth * VIEW_RECT_RATIO;
-
-            const {offsetX = 0, offsetY = 0} = options ?? {};
-            this.invalidate({sourceImage, offsetX, offsetY});
-
+            this.canvas.width = srcWidth;
+            this.canvas.height = srcWidth * VIEW_RECT_RATIO;
+            const {x, y, onValidate } = options ?? {}
+            this.invalidate({sourceImage, x, y, onValidate});
         }
         return this;
     }

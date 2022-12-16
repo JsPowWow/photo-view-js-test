@@ -38,7 +38,7 @@ const isLoggerEnabled = (logger) => logger && (logger.scope === DEFAULT_LOGGER |
  * @description Simple console logger impl
  * Add possibility to split logging per provided group/scope/key, enable/disable them outputs appropriate
  */
-function ConsoleLoggerScoped (scope) {
+function ConsoleLoggerScoped(scope) {
     const thisScope = scope;
     return Object.freeze({
         get scope() {
@@ -51,8 +51,8 @@ function ConsoleLoggerScoped (scope) {
             setLoggerEnabled(scope, value);
             return this;
         },
-        info: (...args) => (isLoggerEnabled(thisScope) ? console.info : noop)(`[${thisScope}] `,...args),
-        warn: (...args) => (isLoggerEnabled(thisScope) ? console.warn : noop)(`[${thisScope}] `,...args),
+        info: (...args) => (isLoggerEnabled(thisScope) ? console.info : noop)(`[${thisScope}] `, ...args),
+        warn: (...args) => (isLoggerEnabled(thisScope) ? console.warn : noop)(`[${thisScope}] `, ...args),
         error: (...args) => console.error(`[${thisScope}] `, ...args),
     });
 }

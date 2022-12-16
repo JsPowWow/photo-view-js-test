@@ -49,7 +49,7 @@ const AppView = () => {
     };
 
     getElementById("descriptionFileSelector")
-        .onchange = ()=> {
+        .onchange = () => {
         thisLogger.info('Process image description import....');
         editor
             .importDescription(Factory.getPrintDescriptionImporter())
