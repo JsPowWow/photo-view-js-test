@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang=”en”>
+<head>
+    <title>Test application</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1"/>
+</head>
+<body>
+<h1>Simple Example:</h1>
+<form action="#">
+    <fieldset>
+        <div class="actionsToolbar">
+            <label for="fileSelector">Select an Image file</label>
+            <input id="fileSelector" type="file"/>
+        </div>
+        <div class="actionsToolbar">
+            <label for="descriptionFileSelector">Select a Descriptor file</label>
+            <input id="descriptionFileSelector" type="file"/>
+        </div>
+        <hr>
+        <div class="actionsToolbar">
+            <button id="btnMoveUp" type="button" class="actionButton">Move Up</button>
+            <div>
+                <button id="btnMoveLeft" type="button" class="actionButton">Move Left</button>
+                <button id="btnMoveRight" type="button" class="actionButton">Move Right</button>
+            </div>
+            <button id="btnMoveDown" type="button" class="actionButton">Move Down</button>
+            <div class="actionsToolbar">
+                <button id="btnSave" type="button" class="actionButton">Save...</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<div id="previewContainer">
+    <canvas id="editorCanvas"></canvas>
+</div>
+
+</body>
+</html>
