@@ -1,4 +1,5 @@
 import {getLogger} from "../supportClasses/Logger";
+import Position from "../supportClasses/Position";
 
 const thisLogger = getLogger('CanvasViewLogging');
 const VIEW_RECT_RATIO = 10 / 15;
@@ -17,13 +18,27 @@ class CanvasView {
     #rafId
 
     /**
-     * @description Initialize view with {@link HTMLCanvasElement} DOM element reference
-     * @param canvasElement {HTMLCanvasElement}
-     * @returns {CanvasView}
+     * @type {Position}
      */
-    withElement(canvasElement) {
-        this.#canvas = canvasElement;
-        return this;
+    #topLeft = new Position();
+
+    /**
+     * @type {Position}
+     */
+    get topLeft() {
+        return this.#topLeft;
+    }
+
+    /**
+     * @type {Position}
+     */
+    #offset = new Position();
+
+    /**
+     * @type {Position}
+     */
+    get offset() {
+        return this.#offset;
     }
 
     /**
@@ -34,10 +49,21 @@ class CanvasView {
     }
 
     /**
+     * @description Initialize view with {@link HTMLCanvasElement} DOM element reference
+     * @param canvasElement {HTMLCanvasElement}
+     * @returns {CanvasView}
+     */
+    withElement(canvasElement) {
+        this.#canvas = canvasElement;
+        return this;
+    }
+
+    /**
      * @description Clear the view surface
      * @returns {CanvasView}
      */
     clear() {
+        // TODO not required ?
         this.#canvas
             .getContext('2d')
             .clearRect(0, 0, this.#canvas.width, this.#canvas.height);
@@ -77,9 +103,24 @@ class CanvasView {
 
     validate({sourceImage, offsetX, offsetY}) {
         if (sourceImage) {
-            const {x, y, width, height} = this.computeTargetRect(sourceImage, {offsetX, offsetY})
+            thisLogger.info("~~~~~~~ compute for ", {offsetX, offsetY});
+
+            const {x:newX, y:newY, width, height} = this.computeTargetRect(sourceImage, {offsetX, offsetY})
+
+            thisLogger.info("rect:", {newX, newY, width, height});
+            thisLogger.info(`canvas: ${this.canvas.width},${this.canvas.height}`);
+            thisLogger.info(`image: ${sourceImage.naturalWidth},${sourceImage.naturalWidth}`);
+
             const ctx = this.#canvas.getContext('2d');
-            ctx.drawImage(sourceImage, x, y, width, height);
+            ctx.drawImage(sourceImage, newX, newY, width, height);
+
+            this.#topLeft.reset({x: newX, y: newY});
+            this.#offset.reset({x: offsetX, y: offsetY});
+
+            thisLogger.info("will draw:", {newX, newY, width, height});
+            thisLogger.info("topLeft:", `${this.topLeft.x},${this.topLeft.y}`);
+            thisLogger.info("offset:", `${this.offset.x},${this.offset.y}`);
+
         }
     }
 

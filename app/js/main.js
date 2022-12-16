@@ -1,6 +1,6 @@
 import '../css/main.scss'
-import CanvasView from './canvasView/CanvasView'
-import Editor from "./editor/Editor";
+import CanvasView from './views/CanvasView'
+import PhotoViewer from "./views/PhotoViewer";
 import {getLogger} from "./supportClasses/Logger";
 import Factory from "./appFactoryConfig";
 import {HORIZONTAL_SCROLL_STEP, VERTICAL_SCROLL_STEP} from "./constants";
@@ -11,7 +11,7 @@ const getElementById = (elementId) => document.getElementById(elementId);
 
 const AppView = () => {
 
-    const editor = new Editor()
+    const editor = new PhotoViewer()
         .withSurface(new CanvasView()
             .withElement(getElementById("editorCanvas")));
 

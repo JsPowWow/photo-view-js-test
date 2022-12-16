@@ -17,19 +17,10 @@ class Position {
 
     #yPos = 0;
 
-    /**
-     * @description TODO
-     * @param xBy {Number}
-     * @param yBy {Number}
-     */
-    moveBy(xBy, yBy) {
-        this.#xPos = this.#xPos + xBy;
-        this.#yPos = this.#yPos + yBy;
-    }
-
-    reset(options = {xPos : 0, yPos : 0}) {
-        this.#xPos = options.xPos ?? 0;
-        this.#yPos = options.yPos ?? 0;
+    reset(options = {x : 0, y : 0}) {
+        this.#xPos = options.x ?? 0;
+        this.#yPos = options.y ?? 0;
+        return this;
     }
 }
 
