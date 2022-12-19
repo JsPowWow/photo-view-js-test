@@ -11,11 +11,11 @@
     <fieldset>
         <div class="actionsToolbar">
             <label for="fileSelector">Select an Image file</label>
-            <input id="fileSelector" type="file"/>
+            <input id="fileSelector" type="file" name="fileSelector" accept="image/png, image/jpeg, image/gif"/>
         </div>
         <div class="actionsToolbar">
             <label for="descriptionFileSelector">Select a Descriptor file</label>
-            <input id="descriptionFileSelector" type="file"/>
+            <input id="descriptionFileSelector" type="file" name="descriptionFileSelector" accept="application/json"/>
         </div>
         <hr>
         <div class="actionsToolbar">
@@ -34,6 +34,5 @@
 <div id="previewContainer">
     <canvas id="editorCanvas"></canvas>
 </div>
-
 </body>
 </html>

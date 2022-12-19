@@ -1,9 +1,12 @@
 import {getLogger} from "../supportClasses/Logger";
 import Position from "../supportClasses/Position";
-import {computeTargetRect} from "./utils";
+import {identity} from "../supportClasses/utils";
 
-const thisLogger = getLogger('CanvasViewLogging');
-const VIEW_RECT_RATIO = 10 / 15;
+const thisLogger = getLogger('CanvasViewLoggingOutput');
+
+export const VIEW_WIDTH_IN_INCHES = 15;
+export const VIEW_HEIGHT_IN_INCHES = 10;
+const VIEW_RECT_ASPECT_RATIO = VIEW_HEIGHT_IN_INCHES / VIEW_WIDTH_IN_INCHES;
 
 class CanvasView {
     /**
@@ -19,18 +22,13 @@ class CanvasView {
     #rafId
 
     /**
+     * @description The current top-left drawn image position on canvas
      * @type {Position}
      */
     #topLeft = new Position();
 
     /**
-     * @type {Position}
-     */
-    get topLeft() {
-        return this.#topLeft;
-    }
-
-    /**
+     * @description {@link HTMLCanvasElement} DOM element reference
      * @returns {HTMLCanvasElement} The {@link HTMLCanvasElement} DOM element reference associated with view
      */
     get canvas() {
@@ -38,7 +36,31 @@ class CanvasView {
     }
 
     /**
-     * @description Initialize view with {@link HTMLCanvasElement} DOM element reference
+     * @description The current top-left drawn image position on canvas
+     * @type {Position}
+     */
+    get topLeft() {
+        return this.#topLeft;
+    }
+
+    /**
+     * @description The current {@link HTMLCanvasElement} DOM element client width in logical pixels
+     * @return {number}
+     */
+    get width() {
+        return this.canvas.clientWidth
+    }
+
+    /**
+     * @description The current {@link HTMLCanvasElement} DOM element client height in logical pixels
+     * @return {number}
+     */
+    get height() {
+        return this.canvas.clientHeight;
+    }
+
+    /**
+     * @description Initialize {@link CanvasView} with {@link HTMLCanvasElement} DOM element reference
      * @param canvasElement {HTMLCanvasElement}
      * @returns {CanvasView}
      */
@@ -47,58 +69,70 @@ class CanvasView {
         return this;
     }
 
-    invalidate(infos) {
+    /**
+     * @description Pending/update the image drawInfo to be drawn later
+     * @param {PhotoDrawInfoPayload} drawInfos
+     */
+    invalidate(drawInfos) {
         if (this.#rafId) {
             window.cancelAnimationFrame(this.#rafId);
             this.#rafId = undefined;
         }
         this.#rafId = window.requestAnimationFrame(() => {
-            this.validate(infos)
+            this.validate(drawInfos)
         })
     }
 
-    validate({sourceImage, x, y, onValidate}) {
-        if (sourceImage) {
+    /**
+     * @description Perform Draw the provided {HTMLImageElement} image onto {HTMLCanvasElement}
+     * @param {PhotoDrawInfoPayload} drawInfos
+     */
+    validate(drawInfos) {
+        const {image, x, y, width, height, onValidate = identity} = drawInfos;
+        if (image) {
             thisLogger.info(`~~~~~~~ validate for ${x},${y}`);
             thisLogger.info(`@canvas: ${this.canvas.width},${this.canvas.height}`);
-            thisLogger.info(`@image: ${sourceImage.naturalWidth},${sourceImage.naturalWidth}`);
+            thisLogger.info(`@image: ${image.naturalWidth},${image.naturalHeight}`);
 
-            const {x: newX = 0, y: newY = 0, width = 0, height = 0} = onValidate
-                ? onValidate({...computeTargetRect({canvas: this.canvas, image:sourceImage, x, y})})
-                : computeTargetRect({canvas: this.canvas, image:sourceImage, x, y})
+            const {x: newX = 0, y: newY = 0, width: newWidth = 0, height: newHeight = 0} = onValidate({
+                canvas: this.canvas, image: image, x, y, width, height
+            });
 
-            thisLogger.info("calc:", {newX, newY, width, height});
+            thisLogger.info("calc:", {newX, newY, newWidth, newHeight});
 
             const ctx = this.canvas.getContext('2d');
             this.topLeft.reset({x: newX, y: newY});
-            ctx.drawImage(sourceImage, this.topLeft.x, this.topLeft.y, width, height);
-            thisLogger.info(`~~~~~~~ validated: topLeft:(${this.topLeft.x},${this.topLeft.y}), size:${width},${height}`);
+            ctx.drawImage(image, this.topLeft.x, this.topLeft.y, newWidth, newHeight);
+            thisLogger.info(`~~~~~~~ validated: topLeft:(${this.topLeft.x},${this.topLeft.y}), size:${newWidth},${newHeight}`);
         }
     }
 
     /**
      * @description Draw provided {@link HTMLImageElement} image onto canvas view
-     * @param sourceImage {HTMLImageElement}
-     * @param [options] {Object}
-     * @param [options.x] {Number}
-     * @param [options.y] {Number}
-     * @param [options.onValidate] {Function}
+     * @param image {HTMLImageElement} Image to draw onto canvas view
+     * @param [options] {Object} Configuration options
+     * @param [options.x=] {Number} The custom horizontal position of image
+     * @param [options.y=] {Number} The custom vertical position of image
+     * @param [options.onValidate=] {function(PhotoDrawInfoPayload):PhotoDrawInfoPayload} Callback which occurred on validation phase
      * @returns {CanvasView}
      */
+    drawFromImage(image, options = undefined) {
+        if (image) {
+            const imgWidth = image.naturalWidth;
+            const imgHeight = image.naturalHeight;
+            this.canvas.width = imgWidth;
+            this.canvas.height = imgWidth * VIEW_RECT_ASPECT_RATIO;
+            const {x, y, onValidate} = options ?? {}
 
-    drawFromImage(sourceImage, options = undefined) {
-        if (sourceImage) {
-            const srcWidth = sourceImage.naturalWidth;
-            this.canvas.width = srcWidth;
-            this.canvas.height = srcWidth * VIEW_RECT_RATIO;
-            const {x, y, onValidate } = options ?? {}
-            this.invalidate({sourceImage, x, y, onValidate});
+            this.invalidate({
+                canvas: this.canvas, image, x, y, width: imgWidth, height: imgHeight, onValidate
+            });
         }
         return this;
     }
 
 }
 
-thisLogger.setEnabled(true);
+thisLogger.setEnabled(false);
 
 export default CanvasView;

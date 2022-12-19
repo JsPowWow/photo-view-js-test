@@ -6,6 +6,12 @@ export const noop = (..._) => {
     /** This is intentional */
 };
 
+/**
+ * @description Returns the first argument it receives.
+ * @param {*} source
+ * @returns {*}
+ */
+export const identity = (source) => source;
 
 /**
  * @description Simple shorthand to check if provided value is not null and defined
