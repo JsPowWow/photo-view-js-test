@@ -21,7 +21,7 @@ const AppView = () => {
         editor
             .importImage(Factory.getImageFileImporter())
             .then(() => thisLogger.info(`The image is successfully imported.`))
-            .catch(thisLogger.error);
+            .catch(thisLogger.warn);
     };
 
     // bind action buttons to editor
@@ -45,7 +45,7 @@ const AppView = () => {
         editor
             .exportDescription(Factory.getPrintDescriptionExporter())
             .then(() => thisLogger.info(`The image print description is successfully exported.`))
-            .catch(thisLogger.error);
+            .catch(thisLogger.warn);
     };
 
     getElementById("descriptionFileSelector")
@@ -54,7 +54,7 @@ const AppView = () => {
         editor
             .importDescription(Factory.getPrintDescriptionImporter())
             .then(() => thisLogger.info(`The image description is successfully imported.`))
-            .catch(thisLogger.error);
+            .catch(thisLogger.warn);
     };
 
 };

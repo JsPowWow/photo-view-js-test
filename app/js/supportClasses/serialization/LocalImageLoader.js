@@ -5,8 +5,7 @@ const SUPPORTED_FILE_TYPES = new Set([
 ]);
 
 /**
- * @description TODO
- * @param file
+ * @param {File} file
  * @returns {Promise<string | ArrayBuffer>}
  */
 const readAsDataURLAsync = (file) => {
@@ -21,7 +20,7 @@ const readAsDataURLAsync = (file) => {
 };
 
 /**
- * @description TODO
+ * @description Process the File Selection using "Open File dialog"
  * @param source {string | ArrayBuffer}
  * @returns {Promise<HTMLImageElement>}
  */

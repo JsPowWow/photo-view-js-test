@@ -3,8 +3,8 @@ const SUPPORTED_FILE_TYPES = new Set([
 ]);
 
 /**
- * @description TODO
- * @param file
+ * @description Read provided file as "json"
+ * @param {File} file
  * @returns {Promise<string | ArrayBuffer>}
  */
 const readDataAsync = (file) => {
@@ -17,6 +17,11 @@ const readDataAsync = (file) => {
     });
 };
 
+/**
+ * @description Process the File Selection using "Open File dialog"
+ * @param {String} inputId The appropriate html input type="file" element id
+ * @return {Promise<{file: *, data: (string|ArrayBuffer)}>}
+ */
 async function processFile(inputId) {
     const file = document.getElementById(inputId).files[0];
     if (!file) {
