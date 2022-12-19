@@ -62,4 +62,14 @@ const AppView = () => {
 
 AppView();
 
-thisLogger.setEnabled(true);
+thisLogger.setEnabled(false);
+
+/**
+ * ### Nice to have
+ * - [x] Fix the HOR/VER scroll step scale correct
+ * - [ ] Refer to public own props in classes
+ * - [ ] MouseDown / Move / Leave live scrolling, positioning
+ * - [ ] Layout / design proper the toolbar controls
+ * - [ ] Add reset to default pos button
+ */
+

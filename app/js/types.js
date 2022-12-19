@@ -1,8 +1,4 @@
 /**
- * The Typescript / JSDoc type(s) / annotation(s)
- */
-
-/**
  * @typedef Importer The abstract Importer type interface
  * @property {function():Promise<{id:String,data:*}>} import
  */

@@ -1,6 +1,5 @@
 import {isDefined} from "../supportClasses/utils";
-import {VIEW_WIDTH_IN_INCHES} from "./CanvasView";
-
+import {VIEW_WIDTH_IN_INCHES} from "../constants";
 
 class PhotoDescriptionBuilder {
     /**
