@@ -1,9 +1,11 @@
 import {getLogger} from "../supportClasses/Logger";
 import Position from "../supportClasses/Position";
 import {identity} from "../supportClasses/utils";
-import {VIEW_RECT_ASPECT_RATIO} from "../constants";
+import {VIEW_HEIGHT_IN_INCHES, VIEW_WIDTH_IN_INCHES} from "../constants";
 
 const thisLogger = getLogger('CanvasViewLoggingOutput');
+
+const VIEW_RECT_ASPECT_RATIO = VIEW_HEIGHT_IN_INCHES / VIEW_WIDTH_IN_INCHES;
 
 class CanvasView {
     /**

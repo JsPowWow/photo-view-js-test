@@ -13,6 +13,14 @@ export const VERTICAL_SCROLL_STEP = 15;
  */
 export const HORIZONTAL_SCROLL_STEP = 15;
 
+/**
+ * @description The client width of canvas control view in inches
+ * @type {number}
+ */
 export const VIEW_WIDTH_IN_INCHES = 15;
+
+/**
+ * @description The client height of canvas control view in inches
+ * @type {number}
+ */
 export const VIEW_HEIGHT_IN_INCHES = 10;
-export const VIEW_RECT_ASPECT_RATIO = VIEW_HEIGHT_IN_INCHES / VIEW_WIDTH_IN_INCHES;
