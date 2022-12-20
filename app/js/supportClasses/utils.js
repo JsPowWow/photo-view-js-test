@@ -20,3 +20,10 @@ export const identity = (source) => source;
  */
 export const isDefined = (value) => (value !== undefined && value !== null);
 
+
+/**
+ * @description Simple promisified "setTimeout" shorthand
+ * @param {Number} ms value to check.
+ * @param withResult
+ */
+export const waitFor = (ms, withResult = undefined) => new Promise((resolve) => setTimeout(resolve, ms, withResult));
